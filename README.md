@@ -30,4 +30,22 @@
 
 :현재 결정 되지 않은 부분이 있음, 객체 지향 설계 방법 사용
 
+-> SOLID
+
+SRP:단일 책임 원칙(single responsibility principle)
+
+OCP:개방-폐쇄 원칙(Open/closed principle)
+
+LSP:리스코프 치환 원칙(Liskov substitution principle)
+
+ISP:인터페이스 분리 원칙(Interface segregation principle)
+
+DIP:의존관계 역전 원칙(Dependency inversion principle)
+
+
 :인터페이스 만들고 구현체를 갈아 끼울 수 있도록 설계 
+
+###회원 도메인 설계
+![img.png](img.png)
+![img_1.png](img_1.png)
+![img_2.png](img_2.png)
