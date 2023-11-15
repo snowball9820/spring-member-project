@@ -51,6 +51,20 @@ DIP:의존관계 역전 원칙(Dependency inversion principle)
 ![img_1.png](img_1.png)
 ![img_2.png](img_2.png)
 
+### 회원 도메인 설계 문제점
+설계상 문제점은 무엇인가?
+
+다른 저장소로 변경할 때 OCP 원칙을 잘 준수할까?
+
+DIP를 잘 지키고 있나?
+
+=>의존관계가 인터페이스 뿐만 아니라 구현까지 모두 의존...
+MemberServiceImpl은 MemberRepository와 MemoryMemberRepository 추상화, 구현체에도 의존...DIP위반
+
+
+
+
+
 
 ### *새로운 단축키...
 psvm+enter
