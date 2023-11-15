@@ -50,3 +50,15 @@ DIP:의존관계 역전 원칙(Dependency inversion principle)
 ![img.png](img.png)
 ![img_1.png](img_1.png)
 ![img_2.png](img_2.png)
+
+
+### *새로운 단축키...
+psvm+enter
+
+soutv 
+
+Alt+insert -> generate 
+
+Ctrl+A -> 전체 선택
+
+Shift+Ctrl+Alt+L ->코드 정렬
