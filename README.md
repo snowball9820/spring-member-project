@@ -50,7 +50,8 @@ DIP:의존관계 역전 원칙(Dependency inversion principle)
 DIP를 잘 지키고 있나?
 
 =>의존관계가 인터페이스 뿐만 아니라 구현까지 모두 의존...  
-MemberServiceImpl은 MemberRepository와 MemoryMemberRepository 추상화, 구현체에도 의존...DIP위반
+MemberServiceImpl은 MemberRepository와 MemoryMemberRepository 추상화, 구현체에도 의존...DIP위반  
+
 ---
 ### 주문과 할인 도메인 설계
 
@@ -71,6 +72,12 @@ MemberServiceImpl은 MemberRepository와 MemoryMemberRepository 추상화, 구�
 ![img_6.png](img_6.png)
 ![img_7.png](img_7.png)
 
+회원을 메모리에서 조회, 정액 할인 정책(고정 금액)을 지원해도 주문 서비스 변경하지 않아도 됨  
+역할들의 협력 관계를 그대로 재사용 가능  
+:메모리에서 DB로 바뀌거나 정액 할인 정책이 정률 할인 정책이 되어도 그대로 재사용 가능  
+(객체지향의 사실과 오해를 읽어보자...)
+
+
 
 
 
@@ -85,3 +92,5 @@ Alt+insert -> generate
 Ctrl+A -> 전체 선택
 
 Shift+Ctrl+Alt+L ->코드 정렬
+
+F2 -> 오류 발생 지점으로 이동
