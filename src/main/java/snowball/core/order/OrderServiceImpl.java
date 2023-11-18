@@ -2,6 +2,7 @@ package snowball.core.order;
 
 import snowball.core.discount.DiscountPolicy;
 import snowball.core.discount.FixDiscountPolicy;
+import snowball.core.discount.RateDiscountPolicy;
 import snowball.core.member.Member;
 import snowball.core.member.MemberRepository;
 import snowball.core.member.MemoryMemberRepository;
@@ -9,8 +10,9 @@ import snowball.core.member.MemoryMemberRepository;
 public class OrderServiceImpl implements OrderService{
     //아래 두개 필요 MemoryMemberRepository와 FixDiscountPolicy 구현체가 있어야지
     private final MemberRepository memberRepository=new MemoryMemberRepository();
-    private final DiscountPolicy discountPolicy=new FixDiscountPolicy();
 
+    //  private final DiscountPolicy discountPolicy=new FixDiscountPolicy();
+    private final DiscountPolicy discountPolicy=new RateDiscountPolicy();
     @Override
     public Order createOrder(Long memberId, String itemName, int itemPrice) {
         //일단 멤버 찾고
