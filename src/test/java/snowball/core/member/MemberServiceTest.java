@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class MemberServiceTest {
-    MemberService memberService=new MemberServiceImpl();
+    MemberService memberService=new MemberServiceImpl(memberRepository);
     @Test
     void join(){
         //given

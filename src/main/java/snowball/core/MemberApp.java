@@ -12,7 +12,7 @@ public class MemberApp {
     //member와 findMemeber가 같으면 제대로 된거임
     public static void main(String[] args) {
 
-        MemberService memberService = new MemberServiceImpl();
+        MemberService memberService = new MemberServiceImpl(memberRepository);
         Member member = new Member(1L, "memberA", Grade.VIP);
         memberService.join(member);
 
