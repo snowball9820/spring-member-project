@@ -10,9 +10,10 @@ import snowball.core.member.MemoryMemberRepository;
 public class OrderServiceImpl implements OrderService{
     //아래 두개 필요 MemoryMemberRepository와 FixDiscountPolicy 구현체가 있어야지
     private final MemberRepository memberRepository=new MemoryMemberRepository();
+    private DiscountPolicy discountPolicy;
 
-    //  private final DiscountPolicy discountPolicy=new FixDiscountPolicy();
-    private final DiscountPolicy discountPolicy=new RateDiscountPolicy();
+    //private final DiscountPolicy discountPolicy=new FixDiscountPolicy();
+    //private final DiscountPolicy discountPolicy=new RateDiscountPolicy();
     @Override
     public Order createOrder(Long memberId, String itemName, int itemPrice) {
         //일단 멤버 찾고
