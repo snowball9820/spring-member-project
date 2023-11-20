@@ -8,6 +8,8 @@ public class OrderServiceImpl implements OrderService{
     //아래 두개 필요 MemoryMemberRepository와 FixDiscountPolicy 구현체가 있어야지
     private final MemberRepository memberRepository;
     private final DiscountPolicy discountPolicy;
+    //final로 되어있으면 생성자를 통해 할당이 되어야 함
+    //DIP를 지키고 있음
 
     public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
         this.memberRepository = memberRepository;
