@@ -375,7 +375,10 @@ public class ApplicationContextInfoTest {
 * ac.getBean(): 빈 이름으로 빈 객체(인스턴스) 조회  (스프링 컨테이너에서 찾아옴)
 ##### Application 빈 출력  
 * 스프링 내부에서 사용하는 빈 제외, 등록한 빈만 출력  
-* 스프링 내부에서 사용하는 빈 -> getRole()로 구분
+* 스프링 내부에서 사용하는 빈 -> getRole()로 구분  
+  
+##### 빈을 조회하는 기본적인 방법  
+
 
 
 
