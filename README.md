@@ -377,8 +377,65 @@ public class ApplicationContextInfoTest {
 * 스프링 내부에서 사용하는 빈 제외, 등록한 빈만 출력  
 * 스프링 내부에서 사용하는 빈 -> getRole()로 구분  
   
-##### 빈을 조회하는 기본적인 방법  
+##### 빈을 조회하는 기본적인 방법    
+##### 동일한 타입 둘 이상  
+```
+public class ApplicationContextSameBeanFindTest {
+    AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(SameBeanConfig.class);
+    @Test
+    @DisplayName("타입으로 조회할 때 같은 타입이 둘 이상 있으면 중복 오류 발생")
+    void findBeanTypeDuplicate(){
+        MemberRepository bean = ac.getBean(MemberRepository.class); //type만 설정, 호출했을 때 예외가 터짐
+    }
+    //Config를 여기 안에서만 쓸 수 있는 것을 하나 만들자
+    @Configuration
+    static class SameBeanConfig{
 
+        @Bean
+        public MemberRepository memberRepository1(){
+            return new MemoryMemberRepository();
+        }
+        @Bean
+        public MemberRepository memberRepository2(){
+            return new MemoryMemberRepository();
+        }
+    }
+
+}
+```  
+예외 발생 
+```
+org.springframework.beans.factory.NoUniqueBeanDefinitionException:expected single matching bean but found 2: memberRepository1,memberRepository2
+```   
+Bean 두개 찾아짐 MemberRepository1,2    
+```  
+    @Test
+    @DisplayName("타입으로 조회할 때 같은 타입이 둘 이상 있으면 중복 오류 발생")
+    void findBeanTypeDuplicate() {
+//        MemberRepository bean = ac.getBean(MemberRepository.class); //type만 설정, 호출했을 때 예외가 터짐
+        assertThrows(NoUniqueBeanDefinitionException.class,
+                () -> ac.getBean(MemberRepository.class));
+    }
+    
+```    
+현재 Bean이 2개 등록되어 있음
+``` 
+   @Test
+    @DisplayName("특정 타입 모두 조회")
+    void findAllBeanByType() {
+        Map<String, MemberRepository> beanOfType = ac.getBeansOfType(MemberRepository.class);
+        for (String key : beanOfType.keySet()) {
+            System.out.println("key = " + key + " value = " + beanOfType.get(key));
+
+        }
+        System.out.println("beanOfType = " + beanOfType);
+        assertThat(beanOfType.size()).isEqualTo(2);
+    }
+```
+  
+
+
+  
 
 
 
@@ -419,4 +476,6 @@ Ctrl+Alt+M -> refactoring
   
 iter+Tap -> 리스트나 배열이 있을 때 for문 자동완성  
   
-Ctrl+D -> 같은 코드 추가
+Ctrl+D -> 같은 코드 추가  
+  
+Ctrl+Shift+enter -> 코드 컴플리션으로 넘어감
