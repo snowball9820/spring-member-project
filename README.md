@@ -218,7 +218,56 @@ FixDiscountPolicy를 의존하지 않음
   
 ##### 마무리  
 * AppConfig를 통해 관심사를 확실하게 분리  
-* MemberServiceImpl, OrderServiceImpl는 기능을 실행하는 책임만 지면 됨
+* MemberServiceImpl, OrderServiceImpl는 기능을 실행하는 책임만 지면 됨  
+  
+### AppConfig refactoring 
+현재 AppConfig의 문제점
+* AppConfig에 중복 존재  
+* 역할에 따른 구현이 잘 보이지 않음    
+  
+##### 현재 AppConfig
+  
+```
+public class AppConfig {
+
+    public MemberService memberService() {
+        return new MemberServiceImpl(new MemoryMemberRepository()); //생성자 주입 //내가 만든 MemeberServiceImpl은 MemoryMemeberRepository를 쓸거야 주입!
+    }
+
+    public OrderService orderService() {
+        return new OrderServiceImpl(new MemoryMemberRepository(), new FixDiscountPolicy()); //생성자 주입
+
+    }
+}
+
+```    
+원하는 구조
+![img_13.png](img_13.png)  
+  
+```
+public class AppConfig {
+
+    public MemberService memberService(){
+        return new MemberServiceImpl(memberRepository());
+    }
+    private MemberRepository memberRepository(){
+        return new MemoryMemberRepository();
+    }
+
+    public OrderService orderService() {
+        return new OrderServiceImpl(memberRepository(),discountPolicy()); 
+
+    }
+    public DiscountPolicy discountPolicy(){
+        return new FixDiscountPolicy();
+    }
+}
+```  
+  
+* new MemoryMemeberRepository()이 부분이 중복 제거
+* MemoryMemberRepository를 다른 구현체로 변경할 때 한 부분만 변경하면 됨  
+* AppConfig를 보면 역할과 구현 클래스가 한 눈에 들어옴
+
 
   
 
@@ -245,4 +294,6 @@ Assertions -> static method  demand static import하면 assertThat으로만 사�
 
 Ctrl+Shift6 -> 변수명 변경 일괄 적용  
 
-Ctrl+E -> 과거 히스토리 목록  
+Ctrl+E -> 과거 히스토리 목록    
+  
+Ctrl+Alt+M -> 리팩터링
