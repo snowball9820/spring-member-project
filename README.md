@@ -296,4 +296,4 @@ Ctrl+Shift6 -> 변수명 변경 일괄 적용
 
 Ctrl+E -> 과거 히스토리 목록    
   
-Ctrl+Alt+M -> 리팩터링
+Ctrl+Alt+M -> refactoring
