@@ -2,6 +2,7 @@ package snowball.core;
 
 import snowball.core.discount.DiscountPolicy;
 import snowball.core.discount.FixDiscountPolicy;
+import snowball.core.discount.RateDiscountPolicy;
 import snowball.core.member.MemberRepository;
 import snowball.core.member.MemberService;
 import snowball.core.member.MemberServiceImpl;
@@ -31,6 +32,7 @@ public class AppConfig {
 
     }
     public DiscountPolicy discountPolicy(){
-        return new FixDiscountPolicy();
+//        return new FixDiscountPolicy();
+        return new RateDiscountPolicy();
     }
 }

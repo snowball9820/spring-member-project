@@ -266,7 +266,52 @@ public class AppConfig {
   
 * new MemoryMemeberRepository()이 부분이 중복 제거
 * MemoryMemberRepository를 다른 구현체로 변경할 때 한 부분만 변경하면 됨  
-* AppConfig를 보면 역할과 구현 클래스가 한 눈에 들어옴
+* AppConfig를 보면 역할과 구현 클래스가 한 눈에 들어옴 
+  
+---  
+  
+AppConfig만 고쳐서 할인 정책 변경   
+![img_14.png](img_14.png)   
+  
+OrderApp을 실행  
+FixDiscountPolicy
+![img_15.png](img_15.png)    
+RateDiscountPolicy
+![img_16.png](img_16.png)  
+  
+OrderServiceImpl은 변경X  
+구성영역의 코드만 교체하면 됨  
+->OCP DIP 모두 만족  
+  
+---  
+  
+##### SRP/DIP/OCP 적용  
+SRP 단일 책임 원칙  
+* 클라이언트 객체는 직접 구현 객체 생성, 연결, 실행하는 다양한 책임을 가졌었음  
+* SRP 원칙을 따르면서 관심사 분리
+* 구현 객체 생성, 연결 책임을 AppConfig에 넘김
+* 클라이언트 객체는 실행하는 책임만 가짐  
+  
+DIP 의존관계 역전 원칙  
+"프로그래머는 추상화에 의존해야지, 구체화에 의존하면 안된다."  
+* 새로운 할인 정책 개발 후 적용할 때 클라이언트 코드도 함께 변경해야 했음  
+* OrderServiceImpl는 DIP를 지키고 DiscountPolicy 추상화 인터페이스에 의존하는 것 처럼 보였으나 FixDiscountPolicy 구체화 구현 클래스에도 의존  
+* 클라이언트 코드가 DiscountPolicy 추상화 인터페이스에만 의존하도록 코드 변경  
+* AppConfig가 FixDiscountPolicy 객체 인스턴스를 클라이언트 코드 대신 생성  
+* 클라이언트 코드에 의존관계 주입->DIP 원칙 따름   
+  
+OCP  
+"소프트웨어 요소 확장에는 열려있으나 변경에는 닫혀 있어야 한다."  
+* 다형성 사용, 클라이언트 DIP 지킴  
+* application을 사용영역과 구성영역으로 나눔  
+* AppConfig가 의존관계를 FixDiscountPolicy에서 RateDiscountPolicy로 변경, 클라이언트 코드에 주입->클라이언트 코드 변경X  
+* "소프트웨어 요소를 새롭게 확장해도 사용 영역의 변경은 닫혀 있다."
+
+
+
+
+
+
 
 
   
