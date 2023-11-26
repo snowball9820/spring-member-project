@@ -11,7 +11,7 @@ import snowball.core.order.OrderServiceImpl;
 public class AppConfig {
 
     public MemberService memberService() {
-        return new MemberServiceImpl(new MemoryMemberRepository()); //생성자 주입
+        return new MemberServiceImpl(new MemoryMemberRepository()); //생성자 주입 //내가 만든 MemeberServiceImpl은 MemoryMemeberRepository를 쓸거야 주입!
     }
 
     public OrderService orderService() {

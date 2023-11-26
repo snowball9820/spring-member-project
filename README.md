@@ -125,14 +125,15 @@ OrderServiceImpl는 DiscountPolicy 인터페이스 뿐만 아니라 FixDiscountP
 ---  
 
 ### 관심사 분리  
-자신의 역할을 수행하는 것에만 집중  
-어떠한 것이 오더라도 똑같이 동작  
+자신의 역할을 수행하는 것에만 집중
+어떠한 것이 오더라도 똑같이 동작할 수 있어야 함
+역할에 맞도록 지정하는 책임을 담당하는 별도의 기획자가 나와야 함
   
 ### AppConfig  
 애플리케이션의 전체 동작 방식을 구성, 설정하기  
 구현 객체를 생성하고 연결하는 책임을 가지는 별도의 설정 클래스 생성    
 
-AppConfig는 애플리케이션의 실제 동작이 필요한 구현 객체 생성  
+AppConfig는 애플리케이션의 실제 동작이 필요한 구현 객체 모두 생성  
 - MemberServiceIml  
 - MemoryMemberRepository  
 - OrderServiceIml
@@ -140,11 +141,88 @@ AppConfig는 애플리케이션의 실제 동작이 필요한 구현 객체 생�
 
 AppConfig는 생성한 객체 인스턴스의 참조(레퍼런스)를 '생성자를 통해 주입(연결)'  
 - MemberServiceIml->MemoryMemberRepository
-- OrderServiceIml->MemoryMemberRepository, FixDiscountPolicy
+- OrderServiceIml->MemoryMemberRepository, FixDiscountPolicy  
+   
+```public class MemberServiceImpl implements MemberService{
+
+    //오로지 MemberRepository 인터페이스에만 의존하게 됨 -> 추상화에만 의존 
+    private final MemberRepository memberRepository;
+
+    //생성자를 통해 MemberRepository에 어떤 구현체가 들어가는지 선택
+    public MemberServiceImpl(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }//생성자 만듦
+
+    @Override
+    public void join(Member member) {memberRepository.save(member);}//다형성에 의해서 인터페이스가 아니라 MemoryMemberRepository에 있는 save가 호출됨
+
+    @Override
+    public Member findMember(Long memberId) {
+        return memberRepository.findById(memberId);
+    }
+
+}
+```  
+
+##### 설계 변경  
+MemberSerImpl은 MemoryMemberRepository를 의존하지 않음  
+->단지 MemeberRepository 인터페이스에 의존  
+* 생성자를 통해 어떤 구현객체가 주입될지 알 수 없음  
+* 생성자를 통해 어떤 구현 객체를 주입할지는 오직 AppConfig에서 결정
+* 의존관계에 대한 고민은 AppConfig에 맡기고 실행에만 집중하게 됨  
+
+##### 클래스 설명  
+MemeberService 인터페이스를 구현하는 것은 MemberServiceImpl임  
+MemberServiceImpl는 MemberRepository 인터페이스를 의존  
+여기서 AppConfig를 만들면  
+MemeberServiceImpl와 MemoryMemeberRepository 생성을 AppConfig가 담당함  
+객체와 생성과 연결을 AppConfig가 담당  
+->DIP 완성->관심사 분리->객체를 생성하고 연결하는 역할과 실행하는 역할 분리       
+  
+```
+public class OrderServiceImpl implements OrderService{
+    //아래 두개 필요 MemoryMemberRepository와 FixDiscountPolicy 구현체가 있어야지
+    private final MemberRepository memberRepository;
+    private final DiscountPolicy discountPolicy;
+    //final로 되어있으면 생성자를 통해 할당이 되어야 함
+    //DIP를 지키고 있음
+    //인터페이스에만 의존
+
+    public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
+        this.memberRepository = memberRepository;
+        this.discountPolicy = discountPolicy;
+    }
+
+    //private final DiscountPolicy discountPolicy=new FixDiscountPolicy();
+    //private final DiscountPolicy discountPolicy=new RateDiscountPolicy();
+    @Override
+    public Order createOrder(Long memberId, String itemName, int itemPrice) {
+        //일단 멤버 찾고
+        Member member = memberRepository.findById(memberId);
+        int discountPrice = discountPolicy.discount(member, itemPrice);
+        //설계가 잘된거임...할인에 대한건 discountPolicy 니가 알아서 해 =>단일 책임 원칙 준수
+
+        //orderServiceImpl 역할 끝
+        //조회후 할인 정책에다가 회원을 그냥 넘김
+        //Grade만 넘길지 회원을 넘길지 고민하면 됨
+        return new Order(memberId, itemName, itemPrice, discountPrice);
+    }
+}
+```  
+OrderServiceImpl도 설계 변경  
+FixDiscountPolicy를 의존하지 않음  
+생성자를 통해 어떤 구현 객체가 주입될지 알 수 없음->AppConfig가 결정  
+이제 실행에만 집중    
+  
+---  
+  
+##### 마무리  
+* AppConfig를 통해 관심사를 확실하게 분리  
+* MemberServiceImpl, OrderServiceImpl는 기능을 실행하는 책임만 지면 됨
+
   
 
-
-
+  
 
 
 
@@ -165,4 +243,6 @@ Ctrl+Shift+T -> Test 생성
 
 Assertions -> static method  demand static import하면 assertThat으로만 사용 가능
 
-Ctrl+Shift6 -> 변수명 변경 일괄 적용
+Ctrl+Shift6 -> 변수명 변경 일괄 적용  
+
+Ctrl+E -> 과거 히스토리 목록  

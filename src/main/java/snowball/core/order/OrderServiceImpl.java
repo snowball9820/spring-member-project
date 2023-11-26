@@ -10,6 +10,7 @@ public class OrderServiceImpl implements OrderService{
     private final DiscountPolicy discountPolicy;
     //final로 되어있으면 생성자를 통해 할당이 되어야 함
     //DIP를 지키고 있음
+    //인터페이스에만 의존
 
     public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
         this.memberRepository = memberRepository;

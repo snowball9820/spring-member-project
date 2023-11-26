@@ -11,8 +11,9 @@ public class MemberApp {
     //test 중
     //member와 findMemeber가 같으면 제대로 된거임
     public static void main(String[] args) {
-
-        MemberService memberService = new MemberServiceImpl(memberRepository);
+        AppConfig appConfig=new AppConfig();
+        MemberService memberService= appConfig.memberService();//인터페이스를 받음,
+//        MemberService memberService = new MemberServiceImpl(memberRepository);
         Member member = new Member(1L, "memberA", Grade.VIP);
         memberService.join(member);
 
