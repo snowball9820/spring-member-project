@@ -305,7 +305,78 @@ OCP
 * 다형성 사용, 클라이언트 DIP 지킴  
 * application을 사용영역과 구성영역으로 나눔  
 * AppConfig가 의존관계를 FixDiscountPolicy에서 RateDiscountPolicy로 변경, 클라이언트 코드에 주입->클라이언트 코드 변경X  
-* "소프트웨어 요소를 새롭게 확장해도 사용 영역의 변경은 닫혀 있다."
+* "소프트웨어 요소를 새롭게 확장해도 사용 영역의 변경은 닫혀 있다."  
+  
+---  
+   
+##### ApplicationContext 스프링컨테이너 
+![img_17.png](img_17.png)
+  
+```
+//스프링 컨테이너 생성
+ApplicationContext applicationContext =
+ new AnnotationConfigApplicationContext(AppConfig.class);
+```    
+  
+* ApplicationContext -> 스프링 컨테이너, 인터페이스  
+* 스프링 컨테이너는 XML을 기반으로 만들 수 있음, 애노테이션 기반의 자바 설정 클래스 만들 수 있음  
+* AppConfig를 사용했던 방식이 애노테이션 기반 자바 설정 클래스로 스프링 컨테이너 생성  
+  
+![img_18.png](img_18.png)  
+* new AnnotationConfigApplicationContext(AppConfig.class)  
+* 스프링 컨테이너를 생성할 때 구성 정보 지정 (여기서는 AppConfig.class를 구성 정보로 지정)  
+* 스프링 컨테이너는 파라미터로 넘어온 설정 클래스 정보를 사용하여 스프링 빈 등록  
+* 빈 이름은 메서드 이름 사용  
+* 빈 이름을 직접 부여 할 수도 있음 ex) @Bean(name="memberService2")  
+* 빈 이름은 항상 다른 이름 부여함 (같은 이름을 부여하면 다른 빈 무시 or 기존 빈 덮어버림)  
+* 스프링 컨테이너는 설정 정보를 참고하여 의존관계 주입(DI)  
+  
+![img_19.png](img_19.png)  
+  
+```
+public class ApplicationContextInfoTest {
+    AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
+
+    @Test
+    @DisplayName("모든 빈 출력")
+    void findAllBean() {
+        String[] beanDefinitionNames = ac.getBeanDefinitionNames();
+        for (String beanDefinitionName : beanDefinitionNames) {
+            Object bean = ac.getBean(beanDefinitionName);
+            System.out.println("name = " + beanDefinitionName + "object = " + bean);
+
+        }
+    }
+
+    //등록한 빈 5개만 출력하도록 만들어주는 코드
+    @Test
+    @DisplayName("애플리케이션 빈 출력")
+    void findApplicationBean() {
+        String[] beanDefinitionNames = ac.getBeanDefinitionNames();
+        for (String beanDefinitionName : beanDefinitionNames) {
+            //BeanDefinition 빈에 대한 메타데이터 빈 하나하나의 정보를 꺼냄
+            BeanDefinition beanDefinition = ac.getBeanDefinition(beanDefinitionName);
+
+            //ROLE_APPLICATION 애플리케이션을 주로 개발하기 위해 등록한 빈을 출력
+            //ROLE_APPLICATION: 직접 등록한 애플리케이션 빈
+            //ROLE_INFRASTRUCTURE: 스프링 내부에서 사용하는 빈
+            if (beanDefinition.getRole() == BeanDefinition.ROLE_APPLICATION) {
+                Object bean = ac.getBean(beanDefinitionName);
+                System.out.println("name = " + beanDefinitionName + "object = " + bean);
+            }
+
+        }
+    }
+}
+```  
+  
+##### 모든 빈 출력  
+* ac.getBeanDefinitionNames(): 스프링에 등록된 모든 빈 이름 조회  
+* ac.getBean(): 빈 이름으로 빈 객체(인스턴스) 조회  (스프링 컨테이너에서 찾아옴)
+##### Application 빈 출력  
+* 스프링 내부에서 사용하는 빈 제외, 등록한 빈만 출력  
+* 스프링 내부에서 사용하는 빈 -> getRole()로 구분
+
 
 
 
@@ -341,4 +412,8 @@ Ctrl+Shift6 -> 변수명 변경 일괄 적용
 
 Ctrl+E -> 과거 히스토리 목록    
   
-Ctrl+Alt+M -> refactoring
+Ctrl+Alt+M -> refactoring  
+  
+iter+Tap -> 리스트나 배열이 있을 때 for문 자동완성  
+  
+Ctrl+D -> 같은 코드 추가
