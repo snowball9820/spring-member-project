@@ -431,7 +431,14 @@ Bean 두개 찾아짐 MemberRepository1,2
         System.out.println("beanOfType = " + beanOfType);
         assertThat(beanOfType.size()).isEqualTo(2);
     }
-```
+```  
+  
+---  
+  
+##### 스프링 빈 상속관계  
+모든 Java객체의 최상위 부모는 Object   
+Object 타입으로 조회하면 모든 스프링 빈을 조회  
+
   
 
 
