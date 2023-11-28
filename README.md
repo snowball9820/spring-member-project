@@ -513,8 +513,114 @@ Spring Container를 쓰면 모두 싱글톤으로 만들어서 관리해줌
 * private 생성자로 자식 클래스 만들기 어려움  
 * 결론: 유연성이 떨어져서 안티 패턴이라고 불리기도 함  
   
-#### Singleton Container
+#### Singleton Container  
+주의할 점
+* 싱글톤 패턴이든 싱글톤 컨테이너든 객체 인스턴스 하나만 생성해서 공유하는 방식은 여러 클라이언트가 하나의 같은 객체 인스턴스를 공유하기 때문에 싱글톤 객체는 상태를 유지(stateful)하게 설계 하면 안됨  
+* 무상태(stateless)로 설계해야 함  
+   * 특정 클라이언트에 의존적인 필드 없어야 함
+   * 가급적 읽기만 가능하도록(값을 변경할 수 있는 필드 안됨)
+   * 필드 대신 자바에서 공유되지 않는, 지역변수, 파라미터, ThreadLocal 등을 사용해야 함
+* 스프링 빈의 필드에 공유 값을 설정하면 큰 장애 발생할 수 있음  
+```
+public class StatefulService {
+    private int price; //상태를 유지하는 필드
 
+    //주문을 해서 값을 저장하고
+    public void order(String name, int price){
+        System.out.println("name = " +name+"price = "+price);
+        this.price=price; //여기 문제
+    }
+    //값을 꺼내고 싶었음
+    public int getPrice(){
+        return price;
+    }
+}
+```
+
+```
+public class StatefulServiceTest {
+    @Test
+    void statefulServiceSingleton(){
+        ApplicationContext ac= new AnnotationConfigApplicationContext(TestConfig.class);
+        StatefulService statefulService1 = ac.getBean(StatefulService.class);
+        StatefulService statefulService2 = ac.getBean(StatefulService.class);
+
+        //ThreadA: A 사용자 10000원 주문
+        statefulService1.order("uerA",10000);
+        //ThreadA: A 사용자 10000원 주문 중간에 들어옴
+        statefulService2.order("uerB",20000);
+
+        //ThreadA: A 사용자 주문 금액 조회
+        //기대한건 10000원인데 20000원 나옴
+        int price= statefulService1.getPrice();
+        System.out.println("price = "+price);
+
+        Assertions.assertThat(statefulService1.getPrice()).isEqualTo(20000);
+
+//        statefulService는 같은 객체인데 중간에 다른 값이 들어오면 바뀜..
+
+    }
+
+    static class TestConfig{
+        @Bean
+        public StatefulService statefulService(){
+            return new StatefulService();
+        }
+    }
+}
+```  
+중간에 ThreadB가 들어오자 price값이 바뀜  
+##### 공유 필드 조심!  
+StatefulService 의 price 필드는 공유되는 필드인데, 특정 클라이언트가 값을 변경  
+##### -> 스프링 빈은 항상 무상태(stateless)로 설계해야 함   
+##### -> 공유되지 않는 지역변수 파라미터 사용  
+  
+```
+public class StatefulService {
+//    private int price; //상태를 유지하는 필드
+
+    //주문을 해서 값을 저장하고
+    public int order(String name, int price){
+        System.out.println("name = " +name+"price = "+price);
+        return price;
+    }
+
+}
+
+```  
+```
+public class StatefulServiceTest {
+    @Test
+    void statefulServiceSingleton(){
+        ApplicationContext ac= new AnnotationConfigApplicationContext(TestConfig.class);
+        StatefulService statefulService1 = ac.getBean(StatefulService.class);
+        StatefulService statefulService2 = ac.getBean(StatefulService.class);
+
+        //ThreadA: A 사용자 10000원 주문
+        int userAPrice=statefulService1.order("uerA",10000);
+        //ThreadA: A 사용자 10000원 주문 중간에 들어옴
+        int userBPrice=statefulService2.order("uerB",20000);
+
+        //ThreadA: A 사용자 주문 금액 조회
+        //기대한건 10000원인데 20000원 나옴
+        System.out.println("price = "+userAPrice);
+
+
+//        statefulService는 같은 객체인데 중간에 다른 값이 들어오면 바뀜..
+
+    }
+
+    static class TestConfig{
+        @Bean
+        public StatefulService statefulService(){
+            return new StatefulService();
+        }
+    }
+}
+
+```  
+![img_22.png](img_22.png)  
+##### 지역변수는 공유되지 않아서 값이 제대로 나옴
 
 
 
