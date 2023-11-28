@@ -620,11 +620,127 @@ public class StatefulServiceTest {
 
 ```  
 ![img_22.png](img_22.png)  
-##### 지역변수는 공유되지 않아서 값이 제대로 나옴
+##### 지역변수는 공유되지 않아서 값이 제대로 나옴  
+
+---  
+Configuration & Singleton  
+```
+@Configuration
+public class AppConfig {
+
+    //@Bean memberService->new MemoryMemberRepository() 호출
+    //@Bean orderService->new MemoryMemberREpository() 호출 2번째 호출 ->싱글톤이 깨질까?
+    @Bean
+    public MemberService memberService() {
+        return new MemberServiceImpl(memberRepository());
+    }
+
+    @Bean
+    public MemberRepository memberRepository() {
+        return new MemoryMemberRepository();
+    }
+
+    @Bean
+    public OrderService orderService() {
+        return new OrderServiceImpl(memberRepository(), discountPolicy());
+
+    }
+    @Bean
+    public DiscountPolicy discountPolicy() {
+//        return new FixDiscountPolicy();
+        return new RateDiscountPolicy();
+    }
+}
+
+```  
+* memberService Bean을 보면 memberRepository() 호출
+  * new MemoryMemberRepository() 호출
+* orderService Bean을 보면 memberRepository() 호출  
+  * new MemoryMemberRepository() 호출
 
 
+MemberServiceImpl에 테스트 코드 추가
+```
+public MemberRepository getMemberRepository() {
+ return memberRepository;
+ }
+```
+orderServiceImpl에 테스트 코드 추가  
+```
+public MemberRepository getMemberRepository() {
+ return memberRepository;
+ }
+```  
+ConfigurationSingletonTest  
+```
+public class ConfigurationSingletonTest {
 
+    @Test
+    void configurationTest() {
+        ApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
 
+        //memberService, orderService 꺼냄
+        MemberServiceImpl memberService = ac.getBean("memberService", MemberServiceImpl.class);
+        OrderServiceImpl orderService = ac.getBean("orderService", OrderServiceImpl.class);
+        MemberRepository memberRepository = ac.getBean("memberRepository", MemberRepository.class);
+
+        MemberRepository memberRepository1 = memberService.getMemberRepository();
+        MemberRepository memberRepository2 = orderService.getMemberRepository();
+
+        System.out.println("memberService -> memberRepository = " + memberRepository1);
+        System.out.println("orderService -> memberRepository = " + memberRepository2);
+        System.out.println("memberRepository = " + memberRepository);
+
+        Assertions.assertThat(memberService.getMemberRepository()).isSameAs(memberRepository);
+        Assertions.assertThat(orderService.getMemberRepository()).isSameAs(memberRepository);
+    }
+}
+```  
+##### memberRepository 인스턴스는 모두 같은 인스턴스가 공유되어 사용됨  
+* AppConfig에서 보면 new MemoryMemberRepository가 2번 호출되었는데?  
+* test까지 해서 총 3번 호출임   
+![img_23.png](img_23.png)  
+  
+##### 호출코드 추가  
+```
+@Configuration
+public class AppConfig {
+    //호출 순서 가정
+    //call AppConfig.memberService
+    //call AppConfig.memberRepository
+    //call AppConfig.memberRepository
+    //call AppConfig.orderService
+    //call AppConfig.memberRepository
+    //결과적으로 memberRepository가 3번 호출되어야 함
+    @Bean
+    public MemberService memberService() {
+        System.out.println("call AppConfig.memberService");
+        return new MemberServiceImpl(memberRepository());
+    }
+    
+    @Bean
+    public MemberRepository memberRepository() {
+        System.out.println("call AppConfig.memberRepository");
+        return new MemoryMemberRepository();
+    }
+
+    @Bean
+    public OrderService orderService() {
+        System.out.println("call AppConfig.orderService");
+        return new OrderServiceImpl(memberRepository(), discountPolicy());
+
+    }
+
+    @Bean
+    public DiscountPolicy discountPolicy() {
+//        return new FixDiscountPolicy();
+        return new RateDiscountPolicy();
+    }
+}
+```  
+실제 결과  
+![img_24.png](img_24.png)  
+method가 한번 호출됨 => 스프링이 싱글톤을 보장해줌
 
 
   
@@ -675,4 +791,6 @@ Ctrl+D -> 같은 코드 추가
   
 Ctrl+Shift+enter -> 코드 컴플리션으로 넘어감  
   
-Ctrl+Alt+V -> introduce Variable
+Ctrl+Alt+V -> introduce Variable  
+  
+soutm -> 

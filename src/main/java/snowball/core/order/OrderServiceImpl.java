@@ -31,4 +31,9 @@ public class OrderServiceImpl implements OrderService{
         //Grade만 넘길지 회원을 넘길지 고민하면 됨
         return new Order(memberId, itemName, itemPrice, discountPrice);
     }
+
+    //테스트 용도
+    public MemberRepository getMemberRepository() {
+        return memberRepository;
+    }
 }
