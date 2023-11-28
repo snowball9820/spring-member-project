@@ -443,7 +443,83 @@ Object 타입으로 조회하면 모든 스프링 빈을 조회
 Spring은 BeanDefinition으로 Bean의 설정 메타 정보를 추상화함  
 Spring Bean을 만드는 방법은 2개  
 * 직접 Spring Bean 등록
-* FactoryBean 사용 ex)appConfig
+* FactoryBean 사용 ex)appConfig  
+  
+##### 싱글톤  
+객체가 JAVA JVM 안에 하나만 있어야 하는 패턴  
+  
+##### 스프링 X 순수한 DI Container 
+```
+public class SingleTon {
+    @Test
+    @DisplayName("스프링 없는 순수한 DI Container")
+    void pureContainer(){
+        AppConfig appConfig = new AppConfig();
+        //1. 조회: 호출할 때 마다 객체 생성
+        MemberService memberService1 = appConfig.memberService();
+        //2. 조회: 호출할 때 마다 객체 생성
+        MemberService memberService2 = appConfig.memberService();
+
+        //참조값이 다른 것을 확인
+        System.out.println("memberService1 = " + memberService1);
+        System.out.println("memberService2 = " + memberService2);
+
+    }
+}
+```  
+참조값 확인  
+![img_20.png](img_20.png)  
+JVM 메모리에 계속 객체 생성  
+(웹 애플리케이션은 고객 요청이 많은데 계속 객체를 생성하는 것은 효율적이지 않음)  
+* 현재 문제: 고객 트래픽이 초당 100이 나오면 초당 100개의 객체가 생성, 소멸 -> 메모리 낭비  
+* 해결 방안: 객체가 1개만 생성되고 공유하도록 설계 -> 싱글톤 패턴  
+  
+#### 싱글톤 패턴  
+* 클래스의 인스턴스가 딱 1개만 생성되는 것을 보장하는 디자인 패턴  
+* 객체 인스턴스를 2개 이상 생성하지 못하도록 막음 ->  private 생성자를 사용해서 외부에서 임의로 new 키워드를 사용하지 못하도록 함  
+  
+```
+public class SingletonService {
+    //관례상 private로 하고 static으로 가지면 클래스 레벨에 올라가기 때문에 딱 하나만 존재하게 됨
+    //1.static영역에 객체를 딱 1개만 생성
+    private static final SingletonService instance = new SingletonService(); //객체를 생성하고 자기자신을 생성해서 instance에 참조를 넣어둠
+
+    //2.public으로 열고 객체 인스턴스가 필요하면 이 static 메서드를 통해 조회하도록 허용
+    //조회할 때 사용
+    public static SingletonService getInstance(){
+        return instance;
+    }
+
+   //private으로 만들어서 외부에서는 사용하지 못하게 함
+    //3.생성자를 private로 선언, 외부에서 new 키워드를 사용한 객체 생성 막음
+    private SingletonService(){
+    }
+    public void logic(){
+        System.out.println("싱글톤 객체 로직 호출");
+    }
+}
+```  
+![img_21.png](img_21.png)  
+참조값이 같음, 객체를 1개만 생성  
+  
+AppConfig도 다 싱글톤으로...?  
+Spring Container를 쓰면 모두 싱글톤으로 만들어서 관리해줌    
+  
+##### 싱글톤 패턴의 문제점    
+* 싱글톤 패턴 구현할 때 코드가 많이 들어감  
+* 의존관계상 클라이언트가 구체 클래스에 의존 -> DIP 위반, OCP 위반 가능성 높음  
+* 테스트 어려움  
+* 내부 속성 변경 or 초기화 어려움  
+* private 생성자로 자식 클래스 만들기 어려움  
+* 결론: 유연성이 떨어져서 안티 패턴이라고 불리기도 함  
+  
+#### Singleton Container
+
+
+
+
+
+
 
   
 
