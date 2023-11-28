@@ -438,6 +438,12 @@ Bean 두개 찾아짐 MemberRepository1,2
 ##### 스프링 빈 상속관계  
 모든 Java객체의 최상위 부모는 Object   
 Object 타입으로 조회하면 모든 스프링 빈을 조회  
+  
+##### BeanDefinition  
+Spring은 BeanDefinition으로 Bean의 설정 메타 정보를 추상화함  
+Spring Bean을 만드는 방법은 2개  
+* 직접 Spring Bean 등록
+* FactoryBean 사용 ex)appConfig
 
   
 
@@ -485,4 +491,6 @@ iter+Tap -> 리스트나 배열이 있을 때 for문 자동완성
   
 Ctrl+D -> 같은 코드 추가  
   
-Ctrl+Shift+enter -> 코드 컴플리션으로 넘어감
+Ctrl+Shift+enter -> 코드 컴플리션으로 넘어감  
+  
+Ctrl+Alt+V -> introduce Variable
